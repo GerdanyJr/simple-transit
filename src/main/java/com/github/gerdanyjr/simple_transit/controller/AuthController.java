@@ -9,24 +9,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
-import com.github.gerdanyjr.simple_transit.service.UserService;
+import com.github.gerdanyjr.simple_transit.service.AuthService;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/usuarios")
-public class UserController {
-    private final UserService userService;
+@RequestMapping("/auth")
+public class AuthController {
+    private final AuthService authService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody @Valid RegisterUserReq req) {
-        User createdUser = userService.register(req);
+        User createdUser = authService.register(req);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -37,5 +39,10 @@ public class UserController {
         return ResponseEntity
                 .created(location)
                 .build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenRes> login(@RequestBody @Valid LoginReq req) {
+        return ResponseEntity.ok(authService.login(req));
     }
 }
