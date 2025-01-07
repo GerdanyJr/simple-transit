@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.service.AuthService;
 
@@ -24,7 +26,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody @Valid RegisterUserReq req) {
         User createdUser = authService.register(req);
 
@@ -37,5 +39,10 @@ public class AuthController {
         return ResponseEntity
                 .created(location)
                 .build();
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<TokenRes> login(@RequestBody @Valid LoginReq req) {
+        return ResponseEntity.ok(authService.login(req));
     }
 }
