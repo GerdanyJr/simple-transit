@@ -12,3 +12,11 @@ spring:
   h2:
     console:
       enabled: true
+
+jwt:
+  access-token:
+    secret: 91b48677c9ef80389925ba4f5f2ff8e9
+    expiration-time: 3600
+  refresh-token:
+    expiration-time: 7200
+  issuer: tivic-simple-transit
