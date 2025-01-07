@@ -35,10 +35,10 @@ public class User implements UserDetails {
     @Column(length = 20, nullable = false, unique = true)
     private String login;
 
-    @Column(name = "senha", length = 50, nullable = false)
+    @Column(name = "senha", length = 255, nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "user")
     @JsonBackReference
     private List<Report> reports;
 
