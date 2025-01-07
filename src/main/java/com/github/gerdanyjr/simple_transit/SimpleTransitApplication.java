@@ -1,4 +1,4 @@
-package com.gihub.gerdanyjr.simple_transit;
+package com.github.gerdanyjr.simple_transit;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
