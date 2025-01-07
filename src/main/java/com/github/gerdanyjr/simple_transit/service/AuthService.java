@@ -10,4 +10,6 @@ public interface AuthService {
     User register(RegisterUserReq req);
 
     TokenRes login(LoginReq req);
+
+    TokenRes refreshToken(String refreshToken);
 }

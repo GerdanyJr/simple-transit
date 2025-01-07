@@ -1,12 +1,16 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Verification;
+import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.service.TokenService;
 
@@ -42,15 +46,21 @@ public class TokenServiceImpl implements TokenService {
                 .create()
                 .withIssuer(ISSUER)
                 .withExpiresAt(getExpiresAt(REFRESHTOKENEXPIRATIONTIME))
-                .withClaim("refresh", "true")
+                .withClaim("refreshToken", "true")
                 .withSubject(user.getLogin())
                 .sign(Algorithm.HMAC256(TOKENSECRET));
     }
 
     @Override
-    public String refreshToken(User user, String refreshToken) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'refreshToken'");
+    public TokenRes refreshToken(User user, String refreshToken) {
+        Map<String, String> claims = new HashMap<>();
+        claims.put("refreshToken", "true");
+        validateToken(refreshToken, claims);
+
+        String accessToken = generateAccessToken(user);
+        String newRefreshToken = generateAccessToken(user);
+
+        return new TokenRes(accessToken, newRefreshToken);
     }
 
     @Override
@@ -71,6 +81,20 @@ public class TokenServiceImpl implements TokenService {
                 .withClaim("refreshToken", "true")
                 .build().verify(getToken(refreshToken))
                 .getSubject();
+    }
+
+    private void validateToken(String token, Map<String, String> claims) {
+        Verification verification = JWT
+                .require(Algorithm.HMAC256(TOKENSECRET))
+                .withIssuer(ISSUER);
+
+        claims.forEach((name, value) -> {
+            verification.withClaim(name, value);
+        });
+
+        verification
+                .build()
+                .verify(getToken(token));
     }
 
     private Instant getExpiresAt(Long expirationTime) {

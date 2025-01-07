@@ -1,5 +1,6 @@
 package com.github.gerdanyjr.simple_transit.service;
 
+import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 
 public interface TokenService {
@@ -7,7 +8,7 @@ public interface TokenService {
 
     String generateRefreshToken(User user);
 
-    String refreshToken(User user, String refreshToken);
+    TokenRes refreshToken(User user, String refreshToken);
 
     String getSubject(String accessToken);
 

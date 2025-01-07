@@ -61,4 +61,15 @@ public class AuthServiceImpl implements AuthService {
         return new TokenRes(accessToken, refreshToken);
     }
 
+    @Override
+    public TokenRes refreshToken(String refreshToken) {
+        String subject = tokenService.getRefreshTokenSubject(refreshToken);
+
+        User user = userRepository
+                .findByLogin(subject)
+                .orElseThrow(() -> new RuntimeException("Usuário inválido!"));
+
+        return tokenService.refreshToken(user, refreshToken);
+    }
+
 }
