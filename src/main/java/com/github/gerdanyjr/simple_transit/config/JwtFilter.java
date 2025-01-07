@@ -2,6 +2,7 @@ package com.github.gerdanyjr.simple_transit.config;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,7 +41,9 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = request.getHeader("Authorization");
 
             if (token != null) {
-                String subject = tokenService.getSubject(token);
+                HashMap<String, String> claims = new HashMap<>();
+                claims.put("accessToken", "true");
+                String subject = tokenService.getSubject(token, claims);
 
                 User user = userRepository
                         .findByLogin(subject)
@@ -69,7 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.getWriter().write(toJson(error));
         } catch (Exception e) {
             response.setStatus(HttpStatus.FORBIDDEN.value());
-            
+
             ErrorResponse error = new ErrorResponse(
                     e.getMessage(),
                     Instant.now(),

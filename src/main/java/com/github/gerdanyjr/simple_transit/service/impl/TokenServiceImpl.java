@@ -64,22 +64,17 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String getSubject(String accessToken) {
-        return JWT
+    public String getSubject(String accessToken, Map<String, String> claims) {
+        Verification verification = JWT
                 .require(Algorithm.HMAC256(TOKENSECRET))
-                .withIssuer(ISSUER)
-                .withClaim("accessToken", "true")
-                .build().verify(getToken(accessToken))
-                .getSubject();
-    }
+                .withIssuer(ISSUER);
 
-    @Override
-    public String getRefreshTokenSubject(String refreshToken) {
-        return JWT
-                .require(Algorithm.HMAC256(TOKENSECRET))
-                .withIssuer(ISSUER)
-                .withClaim("refreshToken", "true")
-                .build().verify(getToken(refreshToken))
+        claims.forEach((name, value) -> {
+            verification.withClaim(name, value);
+        });
+
+        return verification
+                .build().verify(getToken(accessToken))
                 .getSubject();
     }
 

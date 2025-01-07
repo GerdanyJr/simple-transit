@@ -1,5 +1,8 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -63,7 +66,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenRes refreshToken(String refreshToken) {
-        String subject = tokenService.getRefreshTokenSubject(refreshToken);
+        Map<String, String> claims = new HashMap<>();
+        claims.put("refreshToken", "true");
+        String subject = tokenService.getSubject(refreshToken, claims);
 
         User user = userRepository
                 .findByLogin(subject)
