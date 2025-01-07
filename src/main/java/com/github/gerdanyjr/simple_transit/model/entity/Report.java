@@ -45,13 +45,13 @@ public class Report {
 
     private Double longitude;
 
-    @OneToMany(mappedBy = "ocorrencia")
+    @OneToMany(mappedBy = "report")
     private List<Comment> comments;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonManagedReference
-    private User users;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "tipo_ocorrencia_id", nullable = false)
