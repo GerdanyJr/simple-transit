@@ -28,10 +28,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
-    public JwtFilter(TokenService tokenService, UserRepository userRepository) {
+    public JwtFilter(TokenService tokenService, UserRepository userRepository, ObjectMapper objectMapper) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -84,7 +86,6 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String toJson(Object object) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(object);
+        return objectMapper.writeValueAsString(object);
     }
 }
