@@ -1,5 +1,6 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
+import com.github.gerdanyjr.simple_transit.model.dto.req.UpdateUserReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.ConflictException;
@@ -75,6 +77,18 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Usuário inválido!"));
 
         return tokenService.refreshToken(user, refreshToken);
+    }
+
+    @Override
+    public User updateUser(UpdateUserReq req, Principal principal) {
+        User user = userRepository
+                .findByLogin(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com login: " + principal.getName()));
+
+        user.setName(req.name());
+        user.setPassword(bCryptPasswordEncoder.encode(req.password()));
+
+        return userRepository.save(user);
     }
 
 }
