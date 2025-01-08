@@ -3,6 +3,7 @@ package com.github.gerdanyjr.simple_transit.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import java.security.Principal;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +26,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
@@ -64,6 +71,8 @@ public class ReportServiceTest {
 
         private Principal principal;
 
+        private Page<Report> mockedPage;
+
         @BeforeEach
         void setup() {
                 principal = mock(Principal.class);
@@ -79,7 +88,7 @@ public class ReportServiceTest {
                 mockReport = new Report(null,
                                 "Summary",
                                 "Description",
-                                Instant.now(),
+                                LocalDateTime.now(),
                                 "Address",
                                 -12.9714,
                                 -15.9714,
@@ -89,11 +98,17 @@ public class ReportServiceTest {
 
                 req = new CreateReportReq("Summary",
                                 "Description",
-                                Instant.now(),
+                                LocalDateTime.now(),
                                 "Address",
                                 -12.9714,
                                 -15.9714,
                                 1);
+
+                mockedPage = new PageImpl<>(
+                                List.of(mockReport, mockReport),
+                                PageRequest.of(0, 10),
+                                2);
+
         }
 
         @Test
@@ -242,7 +257,7 @@ public class ReportServiceTest {
                 CreateReportReq invalidReq = new CreateReportReq(
                                 "Summary",
                                 "Description",
-                                Instant.now().minus(Duration.ofDays(2)),
+                                LocalDateTime.now().minus(Duration.ofDays(2)),
                                 "Address",
                                 -12.9714,
                                 -15.9714,
@@ -283,5 +298,28 @@ public class ReportServiceTest {
 
                 assertEquals("Ocorrência não encontrada com id: 1",
                                 e.getMessage());
+        }
+
+        @SuppressWarnings("unchecked")
+        @Test
+        @DisplayName("should return paginated reports when find all")
+        void whenFindAll_thenReturnPaginatedReports() {
+                when(reportRepository.findAll(
+                                any(Specification.class),
+                                any(Pageable.class)))
+                                .thenReturn(mockedPage);
+
+                PageRes<ReportRes> pageRes = reportService.findAll(null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                0,
+                                "asc",
+                                "id");
+
+                assertNotNull(pageRes);
+                assertEquals(pageRes.data().size(), 2);
+                assertTrue(pageRes.isLastPage());
         }
 }

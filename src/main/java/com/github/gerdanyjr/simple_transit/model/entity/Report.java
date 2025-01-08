@@ -1,10 +1,11 @@
 package com.github.gerdanyjr.simple_transit.model.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +37,7 @@ public class Report {
     private String description;
 
     @Column(name = "data_hora", nullable = false)
-    private Instant timestamp;
+    private LocalDateTime timestamp;
 
     @Column(name = "endereco", length = 100, nullable = false)
     private String address;
@@ -48,7 +49,7 @@ public class Report {
     @OneToMany(mappedBy = "report")
     private List<Comment> comments;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonManagedReference
     private User user;
