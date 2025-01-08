@@ -2,8 +2,10 @@ package com.github.gerdanyjr.simple_transit.util;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.github.gerdanyjr.simple_transit.model.dto.req.CreateCommentReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
+import com.github.gerdanyjr.simple_transit.model.entity.Comment;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
@@ -31,6 +33,16 @@ public class Mapper {
         report.setReportType(reportType);
 
         return report;
+    }
+
+    public static Comment fromCreateCommentReqToComment(CreateCommentReq req, User user, Report report) {
+        Comment comment = new Comment();
+        comment.setComment(req.comment());
+        comment.setDate(req.date());
+        comment.setUser(user);
+        comment.setReport(report);
+
+        return comment;
     }
 
 }
