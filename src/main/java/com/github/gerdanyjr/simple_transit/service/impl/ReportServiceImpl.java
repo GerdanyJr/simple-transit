@@ -5,6 +5,7 @@ import java.security.Principal;
 import org.springframework.stereotype.Service;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
@@ -66,6 +67,15 @@ public class ReportServiceImpl implements ReportService {
         }
 
         reportRepository.delete(foundReport);
+    }
+
+    @Override
+    public ReportRes findById(Integer reportId) {
+        Report foundReport = reportRepository
+                .findById(reportId)
+                .orElseThrow(() -> new NotFoundException("Ocorrência não encontrada com id: " + reportId));
+
+        return Mapper.fromReportToReportRes(foundReport);
     }
 
 }
