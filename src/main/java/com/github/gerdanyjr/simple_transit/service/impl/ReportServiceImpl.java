@@ -55,7 +55,12 @@ public class ReportServiceImpl implements ReportService {
 
                 if (TimeUtil.isBeforeDaysAgo(req.timestamp(), 2)) {
                         throw new ArgumentNotValidException(
-                                        "Não é possível cadastrar eventos que ocorreram a mais de 2 dias");
+                                        "Não é possível cadastrar eventos que ocorreram há mais de 2 dias");
+                }
+
+                if (req.timestamp().isAfter(LocalDateTime.now())) {
+                        throw new ArgumentNotValidException(
+                                        "Não é possível cadastrar eventos com uma data futura");
                 }
 
                 Report report = Mapper.fromCreateReportReqToReport(req, user, reportType);
