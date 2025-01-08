@@ -9,6 +9,7 @@ import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
+import com.github.gerdanyjr.simple_transit.model.exception.impl.UnauthorizedException;
 import com.github.gerdanyjr.simple_transit.repository.ReportRepository;
 import com.github.gerdanyjr.simple_transit.repository.ReportTypeRepository;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
@@ -42,6 +43,23 @@ public class ReportServiceImpl implements ReportService {
         Report report = Mapper.fromCreateReportReqToReport(req, user, reportType);
 
         return reportRepository.save(report);
+    }
+
+    @Override
+    public void delete(Integer reportId, Principal principal) {
+        Report foundReport = reportRepository
+                .findById(reportId)
+                .orElseThrow(() -> new NotFoundException("Ocorrência não encontrada com id: " + reportId));
+
+        User foundUser = userRepository
+                .findByLogin(principal.getName())
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com login: " + principal.getName()));
+
+        if (foundReport.getUser().getId() != foundUser.getId()) {
+            throw new UnauthorizedException("Não é possível excluir este post");
+        }
+
+        reportRepository.delete(foundReport);
     }
 
 }
