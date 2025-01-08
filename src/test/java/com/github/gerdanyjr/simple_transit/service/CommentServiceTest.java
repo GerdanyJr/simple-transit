@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.Principal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,110 +36,110 @@ import com.github.gerdanyjr.simple_transit.service.impl.CommentServiceImpl;
 @ExtendWith(MockitoExtension.class)
 public class CommentServiceTest {
 
-    @Mock
-    private ReportRepository reportRepository;
+        @Mock
+        private ReportRepository reportRepository;
 
-    @Mock
-    private UserRepository userRepository;
+        @Mock
+        private UserRepository userRepository;
 
-    @Mock
-    private CommentRepository commentRepository;
+        @Mock
+        private CommentRepository commentRepository;
 
-    @InjectMocks
-    private CommentServiceImpl commentService;
+        @InjectMocks
+        private CommentServiceImpl commentService;
 
-    private Report mockReport;
+        private Report mockReport;
 
-    private User mockUser;
+        private User mockUser;
 
-    private Comment mockComment;
+        private Comment mockComment;
 
-    private CreateCommentReq createCommentReq;
+        private CreateCommentReq createCommentReq;
 
-    private Principal principal;
+        private Principal principal;
 
-    @BeforeEach
-    void setup() {
-        principal = mock(Principal.class);
+        @BeforeEach
+        void setup() {
+                principal = mock(Principal.class);
 
-        mockUser = new User(1,
-                "Name",
-                "Login",
-                "Password",
-                List.of());
+                mockUser = new User(1,
+                                "Name",
+                                "Login",
+                                "Password",
+                                List.of());
 
-        mockReport = new Report(1,
-                "Summary",
-                "Description",
-                Instant.now(),
-                "Address",
-                -12.9714,
-                -15.9714,
-                null,
-                mockUser,
-                mock(ReportType.class));
+                mockReport = new Report(1,
+                                "Summary",
+                                "Description",
+                                LocalDateTime.now(),
+                                "Address",
+                                -12.9714,
+                                -15.9714,
+                                null,
+                                mockUser,
+                                mock(ReportType.class));
 
-        createCommentReq = new CreateCommentReq("Comment",
-                Instant.now(),
-                mockReport.getId());
+                createCommentReq = new CreateCommentReq("Comment",
+                                LocalDateTime.now(),
+                                mockReport.getId());
 
-        mockComment = new Comment(1,
-                "Comment",
-                Instant.now(),
-                mockUser,
-                mockReport);
-    }
+                mockComment = new Comment(1,
+                                "Comment",
+                                LocalDateTime.now(),
+                                mockUser,
+                                mockReport);
+        }
 
-    @Test
-    @DisplayName("should return created comment when a valid comment is passed")
-    void givenValidComment_whenCreate_thenReturnComment() {
-        when(reportRepository.findById(anyInt()))
-                .thenReturn(Optional.of(mockReport));
+        @Test
+        @DisplayName("should return created comment when a valid comment is passed")
+        void givenValidComment_whenCreate_thenReturnComment() {
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.of(mockReport));
 
-        when(principal.getName())
-                .thenReturn(mockUser.getLogin());
+                when(principal.getName())
+                                .thenReturn(mockUser.getLogin());
 
-        when(userRepository.findByLogin(anyString()))
-                .thenReturn(Optional.of(mockUser));
+                when(userRepository.findByLogin(anyString()))
+                                .thenReturn(Optional.of(mockUser));
 
-        when(commentRepository.save(any(Comment.class)))
-                .thenReturn(mockComment);
+                when(commentRepository.save(any(Comment.class)))
+                                .thenReturn(mockComment);
 
-        Comment comment = commentService.create(createCommentReq, principal);
+                Comment comment = commentService.create(createCommentReq, principal);
 
-        assertNotNull(comment);
-    }
+                assertNotNull(comment);
+        }
 
-    @Test
-    @DisplayName("should throw a exception when inexistent reportId is passed")
-    void givenInvalidReportId_whenCreate_thenThrowNotFoundException() {
-        when(reportRepository.findById(anyInt()))
-                .thenReturn(Optional.empty());
+        @Test
+        @DisplayName("should throw a exception when inexistent reportId is passed")
+        void givenInvalidReportId_whenCreate_thenThrowNotFoundException() {
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.empty());
 
-        NotFoundException e = assertThrows(NotFoundException.class,
-                () -> commentService.create(createCommentReq, principal));
+                NotFoundException e = assertThrows(NotFoundException.class,
+                                () -> commentService.create(createCommentReq, principal));
 
-        assertEquals("Ocorrência não encontrada com id: " + createCommentReq.reportId(),
-                e.getMessage());
-    }
+                assertEquals("Ocorrência não encontrada com id: " + createCommentReq.reportId(),
+                                e.getMessage());
+        }
 
-    @Test
-    @DisplayName("should throw a exception when inexistent principal is provided")
-    void givenInexistentPrincipal_whenCreate_thenThrowNotFoundException() {
-        String login = "login";
+        @Test
+        @DisplayName("should throw a exception when inexistent principal is provided")
+        void givenInexistentPrincipal_whenCreate_thenThrowNotFoundException() {
+                String login = "login";
 
-        when(reportRepository.findById(anyInt()))
-                .thenReturn(Optional.of(mockReport));
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.of(mockReport));
 
-        when(principal.getName())
-                .thenReturn(login);
+                when(principal.getName())
+                                .thenReturn(login);
 
-        when(userRepository.findByLogin(anyString()))
-                .thenReturn(Optional.empty());
+                when(userRepository.findByLogin(anyString()))
+                                .thenReturn(Optional.empty());
 
-        NotFoundException e = assertThrows(NotFoundException.class,
-                () -> commentService.create(createCommentReq, principal));
+                NotFoundException e = assertThrows(NotFoundException.class,
+                                () -> commentService.create(createCommentReq, principal));
 
-        assertEquals("Usuário não encontrado com login: " + login, e.getMessage());
-    }
+                assertEquals("Usuário não encontrado com login: " + login, e.getMessage());
+        }
 }

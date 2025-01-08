@@ -1,6 +1,6 @@
 package com.github.gerdanyjr.simple_transit.model.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +29,7 @@ public class Comment {
     private String comment;
 
     @Column(name = "data_hora", nullable = false)
-    private Instant date;
+    private LocalDateTime date;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)

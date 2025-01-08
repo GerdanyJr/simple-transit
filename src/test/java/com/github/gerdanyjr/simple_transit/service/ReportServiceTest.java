@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.security.Principal;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,7 +79,7 @@ public class ReportServiceTest {
                 mockReport = new Report(null,
                                 "Summary",
                                 "Description",
-                                Instant.now(),
+                                LocalDateTime.now(),
                                 "Address",
                                 -12.9714,
                                 -15.9714,
@@ -89,7 +89,7 @@ public class ReportServiceTest {
 
                 req = new CreateReportReq("Summary",
                                 "Description",
-                                Instant.now(),
+                                LocalDateTime.now(),
                                 "Address",
                                 -12.9714,
                                 -15.9714,
@@ -242,7 +242,7 @@ public class ReportServiceTest {
                 CreateReportReq invalidReq = new CreateReportReq(
                                 "Summary",
                                 "Description",
-                                Instant.now().minus(Duration.ofDays(2)),
+                                LocalDateTime.now().minus(Duration.ofDays(2)),
                                 "Address",
                                 -12.9714,
                                 -15.9714,

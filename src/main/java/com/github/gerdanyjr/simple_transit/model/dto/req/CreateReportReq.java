@@ -1,6 +1,6 @@
 package com.github.gerdanyjr.simple_transit.model.dto.req;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 public record CreateReportReq(
         @NotBlank String summary,
         @NotBlank String description,
-        @NotNull Instant timestamp,
+        @NotNull LocalDateTime timestamp,
         @NotBlank String address,
         Double latitude,
         Double longitude,

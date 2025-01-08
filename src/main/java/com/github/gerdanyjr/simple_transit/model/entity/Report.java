@@ -1,6 +1,6 @@
 package com.github.gerdanyjr.simple_transit.model.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -36,7 +36,7 @@ public class Report {
     private String description;
 
     @Column(name = "data_hora", nullable = false)
-    private Instant timestamp;
+    private LocalDateTime timestamp;
 
     @Column(name = "endereco", length = 100, nullable = false)
     private String address;
