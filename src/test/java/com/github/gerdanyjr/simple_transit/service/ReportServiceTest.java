@@ -276,6 +276,30 @@ public class ReportServiceTest {
         }
 
         @Test
+        @DisplayName("should throw a argument not valid exception when event is later than now")
+        void givenFutureEvent_whenCreate_thenThrowArgumentNotValidException() {
+                CreateReportReq invalidReq = new CreateReportReq(
+                                "Summary",
+                                "Description",
+                                LocalDateTime.now().plus(Duration.ofDays(2)),
+                                "Address",
+                                -12.9714,
+                                -15.9714,
+                                1);
+
+                when(principal.getName())
+                                .thenReturn(mockUser.getLogin());
+
+                when(reportTypeRepository.findById(anyInt()))
+                                .thenReturn(Optional.of(mockReportType));
+
+                when(userRepository.findByLogin(anyString()))
+                                .thenReturn(Optional.of(mockUser));
+
+                assertThrows(ArgumentNotValidException.class, () -> reportService.create(invalidReq, principal));
+        }
+
+        @Test
         @DisplayName("should return report when a existing id is passed")
         void givenExistingId_whenFindById_thenReturnReport() {
                 when(reportRepository.findById(anyInt()))
