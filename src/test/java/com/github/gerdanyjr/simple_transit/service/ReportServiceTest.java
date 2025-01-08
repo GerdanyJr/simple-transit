@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
+import com.github.gerdanyjr.simple_transit.model.exception.impl.ArgumentNotValidException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.UnauthorizedException;
 import com.github.gerdanyjr.simple_transit.repository.ReportRepository;
@@ -208,7 +210,7 @@ public class ReportServiceTest {
 
         @Test
         @DisplayName("should throw a unauthorized exception when user isn't owner")
-        void givenNotOwnerUser_whenDelete_thenThrowException() {
+        void givenNotOwnerUser_whenDelete_thenThrowUnauthorizedException() {
                 User anotherUser = new User(2,
                                 "teste2",
                                 "teste2",
@@ -230,5 +232,29 @@ public class ReportServiceTest {
                 assertEquals("Não é possível excluir este post", e.getMessage());
                 verify(reportRepository, never())
                                 .delete(mockReport);
+        }
+
+        @Test
+        @DisplayName("should throw a argument not valid exception when event is older than 2 days")
+        void givenOlderEvent_whenCreate_thenThrowArgumentNotValidException() {
+                CreateReportReq invalidReq = new CreateReportReq(
+                                "Summary",
+                                "Description",
+                                Instant.now().minus(Duration.ofDays(2)),
+                                "Address",
+                                -12.9714,
+                                -15.9714,
+                                1);
+
+                when(principal.getName())
+                                .thenReturn(mockUser.getLogin());
+
+                when(reportTypeRepository.findById(anyInt()))
+                                .thenReturn(Optional.of(mockReportType));
+
+                when(userRepository.findByLogin(anyString()))
+                                .thenReturn(Optional.of(mockUser));
+
+                assertThrows(ArgumentNotValidException.class, () -> reportService.create(invalidReq, principal));
         }
 }
