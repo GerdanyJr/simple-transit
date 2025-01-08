@@ -8,6 +8,7 @@ import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
+import com.github.gerdanyjr.simple_transit.model.exception.impl.ArgumentNotValidException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.UnauthorizedException;
 import com.github.gerdanyjr.simple_transit.repository.ReportRepository;
@@ -15,6 +16,7 @@ import com.github.gerdanyjr.simple_transit.repository.ReportTypeRepository;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
 import com.github.gerdanyjr.simple_transit.service.ReportService;
 import com.github.gerdanyjr.simple_transit.util.Mapper;
+import com.github.gerdanyjr.simple_transit.util.TimeUtil;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -39,6 +41,10 @@ public class ReportServiceImpl implements ReportService {
         User user = userRepository
                 .findByLogin(principal.getName())
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado com login: " + principal.getName()));
+
+        if (TimeUtil.isBeforeDaysAgo(req.timestamp(), 2)) {
+            throw new ArgumentNotValidException("Não é possível cadastrar eventos que ocorreram a mais de 2 dias");
+        }
 
         Report report = Mapper.fromCreateReportReqToReport(req, user, reportType);
 
