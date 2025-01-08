@@ -1,6 +1,7 @@
 package com.github.gerdanyjr.simple_transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -26,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
@@ -256,5 +258,30 @@ public class ReportServiceTest {
                                 .thenReturn(Optional.of(mockUser));
 
                 assertThrows(ArgumentNotValidException.class, () -> reportService.create(invalidReq, principal));
+        }
+
+        @Test
+        @DisplayName("should return report when a existing id is passed")
+        void givenExistingId_whenFindById_thenReturnReport() {
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.of(mockReport));
+
+                ReportRes reportRes = reportService.findById(1);
+
+                assertNotNull(reportRes);
+                assertEquals(mockReport.getId(), reportRes.id());
+        }
+
+        @Test
+        @DisplayName("should throw a not found exception when a inexistent id is passed")
+        void givenInexistingId_whenFindByid_thenThrowNotFoundException() {
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.empty());
+
+                NotFoundException e = assertThrows(NotFoundException.class,
+                                () -> reportService.findById(1));
+
+                assertEquals("Ocorrência não encontrada com id: 1",
+                                e.getMessage());
         }
 }
