@@ -1,10 +1,12 @@
 package com.github.gerdanyjr.simple_transit.util;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateCommentReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Comment;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
@@ -57,6 +59,14 @@ public class Mapper {
                 report.getLongitude(),
                 report.getUser().getId(),
                 report.getReportType().getId());
+    }
+
+    public static <T> PageRes<T> fromPageToPageRes(Page<T> page) {
+        return new PageRes<>(page.getContent(),
+                page.getNumber(),
+                page.getTotalPages(),
+                page.getNumberOfElements(),
+                page.isLast());
     }
 
 }
