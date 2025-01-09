@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateCommentReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Comment;
@@ -67,6 +68,14 @@ public class Mapper {
                 page.getTotalPages(),
                 page.getNumberOfElements(),
                 page.isLast());
+    }
+
+    public static CommentRes fromCommentToCommentRes(Comment comment) {
+        return new CommentRes(comment.getId(),
+                comment.getComment(),
+                comment.getDate(),
+                comment.getUser().getId(),
+                comment.getReport().getId());
     }
 
 }

@@ -7,10 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
@@ -19,6 +21,7 @@ import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.ArgumentNotValidException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.UnauthorizedException;
+import com.github.gerdanyjr.simple_transit.repository.CommentRepository;
 import com.github.gerdanyjr.simple_transit.repository.ReportRepository;
 import com.github.gerdanyjr.simple_transit.repository.ReportTypeRepository;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
@@ -33,12 +36,14 @@ public class ReportServiceImpl implements ReportService {
         private final ReportRepository reportRepository;
         private final ReportTypeRepository reportTypeRepository;
         private final UserRepository userRepository;
+        private final CommentRepository commentRepository;
 
         public ReportServiceImpl(ReportRepository reportRepository, ReportTypeRepository reportTypeRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository, CommentRepository commentRepository) {
                 this.reportRepository = reportRepository;
                 this.reportTypeRepository = reportTypeRepository;
                 this.userRepository = userRepository;
+                this.commentRepository = commentRepository;
         }
 
         @Override
@@ -124,6 +129,25 @@ public class ReportServiceImpl implements ReportService {
                                 .map(Mapper::fromReportToReportRes);
 
                 return Mapper.fromPageToPageRes(reportPage);
+        }
+
+        @Override
+        public PageRes<CommentRes> findCommentsByReport(Integer reportId, Integer page) {
+                Report foundReport = reportRepository
+                                .findById(reportId)
+                                .orElseThrow(() -> new NotFoundException(
+                                                "Ocorrência não encontrada com id: " + reportId));
+
+                Pageable pageable = PageRequest.of(page,
+                                10,
+                                Direction.DESC,
+                                "date");
+
+                Page<CommentRes> commentPage = commentRepository
+                                .findByReport(foundReport, pageable)
+                                .map(Mapper::fromCommentToCommentRes);
+
+                return Mapper.fromPageToPageRes(commentPage);
         }
 
 }
