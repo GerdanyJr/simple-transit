@@ -11,6 +11,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+
+@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration {
@@ -30,6 +34,11 @@ public class SecurityConfiguration {
                                 .requestMatchers(HttpMethod.POST, "/usuarios/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/ocorrencias/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
+                                .requestMatchers("/v3/api-docs*/**",
+                                        "/swagger-ui/**",
+                                        "swagger-ui.html",
+                                        "/swager-resources/**")
+                                .permitAll()
                                 .anyRequest()
                                 .authenticated())
                 .csrf(csrf -> csrf.disable()
