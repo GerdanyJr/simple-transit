@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
@@ -51,9 +52,9 @@ public class ReportController {
                 .build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReportRes> findById(@PathVariable("id") Integer id) {
-        return ResponseEntity.ok(reportService.findById(id));
+    @GetMapping("/{reportId}")
+    public ResponseEntity<ReportRes> findById(@PathVariable("reportId") Integer reportId) {
+        return ResponseEntity.ok(reportService.findById(reportId));
     }
 
     @GetMapping
@@ -75,6 +76,13 @@ public class ReportController {
                         page,
                         sortDirection,
                         sortBy));
+    }
+
+    @GetMapping("{reportId}/comments")
+    public ResponseEntity<PageRes<CommentRes>> findCommentsByReportId(
+            @PathVariable("reportId") Integer reportId,
+            @RequestParam(name = "page", required = false, defaultValue = "0") Integer page) {
+        return ResponseEntity.ok(reportService.findCommentsByReport(reportId, page));
     }
 
     @DeleteMapping("/{reportId}")
