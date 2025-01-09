@@ -2,6 +2,8 @@ package com.github.gerdanyjr.simple_transit.service.impl;
 
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.LOGIN_ALREADY_REGISTERED;
 
+import java.net.URI;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import com.github.gerdanyjr.simple_transit.model.exception.impl.ConflictExceptio
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
 import com.github.gerdanyjr.simple_transit.service.UserService;
 import com.github.gerdanyjr.simple_transit.util.Mapper;
+import com.github.gerdanyjr.simple_transit.util.UriUtil;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,26 +32,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(RegisterUserReq req) {
+    public URI register(RegisterUserReq req) {
         userRepository
                 .findByLogin(req.login())
                 .ifPresent((foundUser) -> {
                     throw new ConflictException(LOGIN_ALREADY_REGISTERED.apply(req.login()));
                 });
 
-        User createdUser = Mapper.fromRegisterReqToUser(req, bCryptPasswordEncoder);
+        ;
 
-        return userRepository.save(createdUser);
+        User createdUser = userRepository
+                .save(Mapper
+                        .fromRegisterReqToUser(req, bCryptPasswordEncoder));
+
+        return UriUtil.createUri("/{id}", createdUser.getId().toString());
     }
 
     @Override
-    public User updateUser(UpdateUserReq req) {
+    public URI updateUser(UpdateUserReq req) {
         User user = (User) authentication.getPrincipal();
 
         user.setName(req.name());
         user.setPassword(bCryptPasswordEncoder.encode(req.password()));
 
-        return userRepository.save(user);
+        User createdUser = userRepository.save(user);
+
+        return UriUtil.createUri("/{id}", createdUser.getId().toString());
     }
 
 }

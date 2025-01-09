@@ -8,9 +8,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.LOGIN_ALREADY_REGISTERED;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.UpdateUserReq;
@@ -40,6 +46,9 @@ public class UserServiceTest {
         @Mock
         private Authentication authentication;
 
+        @Mock
+        private ServletUriComponentsBuilder uriBuilder;
+
         @InjectMocks
         private UserServiceImpl userService;
 
@@ -50,6 +59,14 @@ public class UserServiceTest {
         private RegisterUserReq registerUserReq;
 
         private UpdateUserReq updateUserReq;
+
+        @BeforeAll
+        static void setupMockRequest() {
+                MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+                mockRequest.setRequestURI("/usuarios");
+                ServletRequestAttributes attributes = new ServletRequestAttributes(mockRequest);
+                RequestContextHolder.setRequestAttributes(attributes);
+        }
 
         @BeforeEach
         void setup() {
@@ -75,7 +92,7 @@ public class UserServiceTest {
         }
 
         @Test
-        @DisplayName("should return created user when a inexistent user is passed")
+        @DisplayName("should return created user location when a inexistent user is passed")
         void givenInexistentUser_whenRegister_thenReturnCreatedUser() {
                 when(userRepository.save(any(User.class)))
                                 .thenReturn(user);
@@ -83,10 +100,10 @@ public class UserServiceTest {
                 when(userRepository.findByLogin(anyString()))
                                 .thenReturn(Optional.empty());
 
-                User createdUser = userService.register(registerUserReq);
+                URI uri = userService.register(registerUserReq);
 
-                assertNotNull(createdUser);
-                assertEquals(createdUser, user);
+                assertNotNull(uri);
+                assertEquals("/usuarios/1", uri.getPath());
         }
 
         @Test
@@ -115,9 +132,8 @@ public class UserServiceTest {
                 when(userRepository.save(any(User.class)))
                                 .thenReturn(updatedUser);
 
-                User result = userService.updateUser(updateUserReq);
-
-                assertEquals(updatedUser.getName(), result.getName());
-                assertEquals(updatedUser.getPassword(), result.getPassword());
+                URI uri = userService.updateUser(updateUserReq);
+                assertNotNull(uri);
+                assertEquals("/usuarios/1", uri.getPath());
         }
 }

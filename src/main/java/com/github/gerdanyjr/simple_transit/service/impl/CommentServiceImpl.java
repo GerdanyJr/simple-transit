@@ -1,5 +1,6 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
+import java.net.URI;
 import java.security.Principal;
 
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import com.github.gerdanyjr.simple_transit.repository.ReportRepository;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
 import com.github.gerdanyjr.simple_transit.service.CommentService;
 import com.github.gerdanyjr.simple_transit.util.Mapper;
+import com.github.gerdanyjr.simple_transit.util.UriUtil;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -32,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment create(CreateCommentReq req, Principal principal) {
+    public URI create(CreateCommentReq req, Principal principal) {
         Report foundReport = reportRepository
                 .findById(req.reportId())
                 .orElseThrow(() -> new NotFoundException(REPORT_NOT_FOUND.apply(req.reportId())));
@@ -43,7 +45,9 @@ public class CommentServiceImpl implements CommentService {
 
         Comment comment = Mapper.fromCreateCommentReqToComment(req, foundUser, foundReport);
 
-        return commentRepository.save(comment);
+        comment = commentRepository.save(comment);
+
+        return UriUtil.createUri("/{id}", comment.getId().toString());
 
     }
 

@@ -1,6 +1,5 @@
 package com.github.gerdanyjr.simple_transit.controller;
 
-import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
@@ -38,17 +36,8 @@ public class ReportController {
     public ResponseEntity<Report> create(
             @RequestBody @Valid CreateReportReq req,
             Principal principal) {
-
-        Report report = reportService.create(req, principal);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(report.getId())
-                .toUri();
-
         return ResponseEntity
-                .created(location)
+                .created(reportService.create(req, principal))
                 .build();
     }
 

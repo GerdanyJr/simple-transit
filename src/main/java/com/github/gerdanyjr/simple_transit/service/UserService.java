@@ -1,12 +1,13 @@
 package com.github.gerdanyjr.simple_transit.service;
 
+import java.net.URI;
+
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.UpdateUserReq;
-import com.github.gerdanyjr.simple_transit.model.entity.User;
 
 public interface UserService {
 
-    User register(RegisterUserReq req);
+    URI register(RegisterUserReq req);
 
-    User updateUser(UpdateUserReq req);
+    URI updateUser(UpdateUserReq req);
 }
