@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 
 import java.util.List;
 import java.util.Optional;
@@ -130,8 +131,10 @@ public class AuthServiceTest {
                 when(userRepository.findByLogin(anyString()))
                                 .thenReturn(Optional.empty());
 
-                assertThrows(NotFoundException.class,
+                NotFoundException e = assertThrows(NotFoundException.class,
                                 () -> authService.refreshToken("refreshToken"));
+
+                assertEquals(USER_NOT_FOUND.apply("subject"), e.getMessage());
         }
 
 }

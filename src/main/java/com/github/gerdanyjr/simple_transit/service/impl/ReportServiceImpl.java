@@ -1,5 +1,9 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_TYPE_NOT_FOUND;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_NOT_FOUND;
+
 import java.security.Principal;
 import java.time.LocalDateTime;
 
@@ -11,6 +15,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.github.gerdanyjr.simple_transit.constants.ErrorMessages;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
@@ -51,21 +56,18 @@ public class ReportServiceImpl implements ReportService {
                 ReportType reportType = reportTypeRepository
                                 .findById(req.reportTypeId())
                                 .orElseThrow(() -> new NotFoundException(
-                                                "ReportType não encontrado com id: " + req.reportTypeId()));
+                                                REPORT_TYPE_NOT_FOUND.apply(req.reportTypeId())));
 
                 User user = userRepository
                                 .findByLogin(principal.getName())
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Usuário não encontrado com login: " + principal.getName()));
+                                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND.apply(principal.getName())));
 
                 if (TimeUtil.isBeforeDaysAgo(req.timestamp(), 2)) {
-                        throw new ArgumentNotValidException(
-                                        "Não é possível cadastrar eventos que ocorreram há mais de 2 dias");
+                        throw new ArgumentNotValidException(ErrorMessages.REPORT_DATE_TOO_OLD);
                 }
 
                 if (req.timestamp().isAfter(LocalDateTime.now())) {
-                        throw new ArgumentNotValidException(
-                                        "Não é possível cadastrar eventos com uma data futura");
+                        throw new ArgumentNotValidException(ErrorMessages.FUTURE_REPORT_DATE);
                 }
 
                 Report report = Mapper.fromCreateReportReqToReport(req, user, reportType);
@@ -77,16 +79,14 @@ public class ReportServiceImpl implements ReportService {
         public void delete(Integer reportId, Principal principal) {
                 Report foundReport = reportRepository
                                 .findById(reportId)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Ocorrência não encontrada com id: " + reportId));
+                                .orElseThrow(() -> new NotFoundException(REPORT_NOT_FOUND.apply(reportId)));
 
                 User foundUser = userRepository
                                 .findByLogin(principal.getName())
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Usuário não encontrado com login: " + principal.getName()));
+                                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND.apply(principal.getName())));
 
                 if (foundReport.getUser().getId() != foundUser.getId()) {
-                        throw new UnauthorizedException("Não é possível excluir este post");
+                        throw new UnauthorizedException(ErrorMessages.UNAUTHORIZED);
                 }
 
                 reportRepository.delete(foundReport);
@@ -96,8 +96,7 @@ public class ReportServiceImpl implements ReportService {
         public ReportRes findById(Integer reportId) {
                 Report foundReport = reportRepository
                                 .findById(reportId)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Ocorrência não encontrada com id: " + reportId));
+                                .orElseThrow(() -> new NotFoundException(REPORT_NOT_FOUND.apply(reportId)));
 
                 return Mapper.fromReportToReportRes(foundReport);
         }
@@ -135,8 +134,7 @@ public class ReportServiceImpl implements ReportService {
         public PageRes<CommentRes> findCommentsByReport(Integer reportId, Integer page) {
                 Report foundReport = reportRepository
                                 .findById(reportId)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Ocorrência não encontrada com id: " + reportId));
+                                .orElseThrow(() -> new NotFoundException(REPORT_NOT_FOUND.apply(reportId)));
 
                 Pageable pageable = PageRequest.of(page,
                                 10,

@@ -8,6 +8,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_NOT_FOUND;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -119,7 +121,7 @@ public class CommentServiceTest {
                 NotFoundException e = assertThrows(NotFoundException.class,
                                 () -> commentService.create(createCommentReq, principal));
 
-                assertEquals("Ocorrência não encontrada com id: " + createCommentReq.reportId(),
+                assertEquals(REPORT_NOT_FOUND.apply(createCommentReq.reportId()),
                                 e.getMessage());
         }
 
@@ -140,6 +142,6 @@ public class CommentServiceTest {
                 NotFoundException e = assertThrows(NotFoundException.class,
                                 () -> commentService.create(createCommentReq, principal));
 
-                assertEquals("Usuário não encontrado com login: " + login, e.getMessage());
+                assertEquals(USER_NOT_FOUND.apply(login), e.getMessage());
         }
 }

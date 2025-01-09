@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
@@ -54,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userRepository
                 .findByLogin(subject)
-                .orElseThrow(() -> new NotFoundException("Usuário inválido!"));
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND.apply(subject)));
 
         return tokenService.refreshToken(user, refreshToken);
     }

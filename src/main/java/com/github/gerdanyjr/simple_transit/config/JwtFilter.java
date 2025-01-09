@@ -1,5 +1,7 @@
 package com.github.gerdanyjr.simple_transit.config;
 
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ErrorResponse;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.BaseException;
+import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
 import com.github.gerdanyjr.simple_transit.service.TokenService;
 
@@ -49,7 +52,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 User user = userRepository
                         .findByLogin(subject)
-                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                        .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND.apply(subject)));
 
                 var authToken = new UsernamePasswordAuthenticationToken(
                         user.getUsername(),

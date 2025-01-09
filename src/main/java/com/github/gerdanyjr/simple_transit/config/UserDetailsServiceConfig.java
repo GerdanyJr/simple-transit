@@ -1,5 +1,7 @@
 package com.github.gerdanyjr.simple_transit.config;
 
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +22,7 @@ public class UserDetailsServiceConfig implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository
                 .findByLogin(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado!"));
+                .orElseThrow(() -> new UsernameNotFoundException(USER_NOT_FOUND.apply(username)));
     }
 
 }
