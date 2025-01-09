@@ -76,13 +76,13 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(e.getCode());
             response.getWriter().write(toJson(error));
         } catch (Exception e) {
-            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
             ErrorResponse error = new ErrorResponse(
                     e.getMessage(),
                     Instant.now(),
-                    HttpStatus.FORBIDDEN,
-                    HttpStatus.FORBIDDEN.value());
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    HttpStatus.INTERNAL_SERVER_ERROR.value());
 
             response.getWriter().write(toJson(error));
         }
