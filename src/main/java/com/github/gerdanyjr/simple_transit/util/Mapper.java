@@ -9,6 +9,7 @@ import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
+import com.github.gerdanyjr.simple_transit.model.dto.res.UserRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Comment;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
@@ -79,6 +80,12 @@ public class Mapper {
                 comment.getDate(),
                 comment.getUser().getId(),
                 comment.getReport().getId());
+    }
+
+    public static UserRes fromUserToUserRes(User foundUser) {
+        return new UserRes(foundUser.getId(),
+                foundUser.getName(),
+                foundUser.getLogin());
     }
 
 }
