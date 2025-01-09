@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.LOGIN_ALREADY_REGISTERED;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 
 import java.net.URI;
 import java.util.List;
@@ -29,8 +31,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.RegisterUserReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.UpdateUserReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.UserRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.ConflictException;
+import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
 import com.github.gerdanyjr.simple_transit.service.impl.UserServiceImpl;
 
@@ -132,8 +136,31 @@ public class UserServiceTest {
                 when(userRepository.save(any(User.class)))
                                 .thenReturn(updatedUser);
 
-                URI uri = userService.updateUser(updateUserReq);
+                URI uri = userService.updateUser(updateUserReq, authentication);
                 assertNotNull(uri);
                 assertEquals("/usuarios/1", uri.getPath());
         }
+
+        @Test
+        @DisplayName("should throw NotFoundException when user does not exist")
+        void givenNonExistentUserId_whenFindById_thenThrowNotFoundException() {
+                when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+                NotFoundException e = assertThrows(
+                                NotFoundException.class,
+                                () -> userService.findById(1));
+
+                assertEquals(USER_NOT_FOUND.apply("1"), e.getMessage());
+        }
+
+        @Test
+        @DisplayName("should return UserRes when user exists")
+        void givenExistentUserId_whenFindById_thenReturnUserRes() {
+                when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+
+                UserRes result = userService.findById(1);
+
+                assertNotNull(result);
+        }
+
 }
