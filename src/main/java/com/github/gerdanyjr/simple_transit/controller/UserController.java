@@ -1,7 +1,6 @@
 package com.github.gerdanyjr.simple_transit.controller;
 
 import java.net.URI;
-import java.security.Principal;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,8 +43,8 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserReq req, Principal principal) {
-        User updatedUser = userService.updateUser(req, principal);
+    public ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserReq req) {
+        User updatedUser = userService.updateUser(req);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

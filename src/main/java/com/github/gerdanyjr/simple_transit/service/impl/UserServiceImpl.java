@@ -1,7 +1,6 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
-import java.security.Principal;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final Authentication authentication;
 
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+            Authentication authentication) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.authentication = authentication;
     }
 
     @Override
@@ -38,8 +40,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(UpdateUserReq req, Principal principal) {
-        User user = (User) principal;
+    public User updateUser(UpdateUserReq req) {
+        User user = (User) authentication.getPrincipal();
 
         user.setName(req.name());
         user.setPassword(bCryptPasswordEncoder.encode(req.password()));
