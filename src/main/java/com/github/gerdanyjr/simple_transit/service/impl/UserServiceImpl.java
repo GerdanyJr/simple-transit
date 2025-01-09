@@ -1,5 +1,7 @@
 package com.github.gerdanyjr.simple_transit.service.impl;
 
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.LOGIN_ALREADY_REGISTERED;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService {
         userRepository
                 .findByLogin(req.login())
                 .ifPresent((foundUser) -> {
-                    throw new ConflictException("Usuário já cadastrado com login: " + req.login());
+                    throw new ConflictException(LOGIN_ALREADY_REGISTERED.apply(req.login()));
                 });
 
         User createdUser = Mapper.fromRegisterReqToUser(req, bCryptPasswordEncoder);

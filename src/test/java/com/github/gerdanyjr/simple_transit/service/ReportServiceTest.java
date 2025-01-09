@@ -12,6 +12,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_TYPE_NOT_FOUND;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_NOT_FOUND;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 
 import java.security.Principal;
 import java.time.Duration;
@@ -32,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import com.github.gerdanyjr.simple_transit.constants.ErrorMessages;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
@@ -166,7 +170,7 @@ public class ReportServiceTest {
                                         reportService.create(req, principal);
                                 });
 
-                assertEquals(e.getMessage(), "ReportType não encontrado com id: 1");
+                assertEquals(REPORT_TYPE_NOT_FOUND.apply(1), e.getMessage());
                 verify(reportRepository, never()).save(any(Report.class));
         }
 
@@ -183,11 +187,9 @@ public class ReportServiceTest {
                                 .thenReturn(mockUser.getLogin());
 
                 NotFoundException e = assertThrows(NotFoundException.class,
-                                () -> {
-                                        reportService.create(req, principal);
-                                });
+                                () -> reportService.create(req, principal));
 
-                assertEquals(e.getMessage(), "Usuário não encontrado com login: " + mockUser.getLogin());
+                assertEquals(USER_NOT_FOUND.apply(mockUser.getLogin()), e.getMessage());
                 verify(reportRepository, never()).save(any(Report.class));
         }
 
@@ -220,7 +222,7 @@ public class ReportServiceTest {
                         reportService.delete(1, principal);
                 });
 
-                assertEquals("Ocorrência não encontrada com id: 1", e.getMessage());
+                assertEquals(REPORT_NOT_FOUND.apply(1), e.getMessage());
                 verify(reportRepository, never())
                                 .delete(mockReport);
         }
@@ -241,7 +243,7 @@ public class ReportServiceTest {
                         reportService.delete(1, principal);
                 });
 
-                assertEquals("Usuário não encontrado com login: " + mockUser.getLogin(), e.getMessage());
+                assertEquals(USER_NOT_FOUND.apply(mockUser.getLogin()), e.getMessage());
                 verify(reportRepository, never())
                                 .delete(mockReport);
         }
@@ -267,7 +269,7 @@ public class ReportServiceTest {
                 UnauthorizedException e = assertThrows(UnauthorizedException.class,
                                 () -> reportService.delete(1, principal));
 
-                assertEquals("Não é possível excluir este post", e.getMessage());
+                assertEquals(ErrorMessages.UNAUTHORIZED, e.getMessage());
                 verify(reportRepository, never())
                                 .delete(mockReport);
         }
@@ -317,7 +319,10 @@ public class ReportServiceTest {
                 when(userRepository.findByLogin(anyString()))
                                 .thenReturn(Optional.of(mockUser));
 
-                assertThrows(ArgumentNotValidException.class, () -> reportService.create(invalidReq, principal));
+                ArgumentNotValidException e = assertThrows(ArgumentNotValidException.class,
+                                () -> reportService.create(invalidReq, principal));
+
+                assertEquals(ErrorMessages.FUTURE_REPORT_DATE, e.getMessage());
         }
 
         @Test
@@ -341,7 +346,7 @@ public class ReportServiceTest {
                 NotFoundException e = assertThrows(NotFoundException.class,
                                 () -> reportService.findById(1));
 
-                assertEquals("Ocorrência não encontrada com id: 1",
+                assertEquals(REPORT_NOT_FOUND.apply(1),
                                 e.getMessage());
         }
 
@@ -389,12 +394,13 @@ public class ReportServiceTest {
         @Test
         @DisplayName("should return report comments when a valid reportId is passed")
         void givenInexistingReportId_whenFindCommentsByReport_thenThrowException() {
+                Integer reportId = 1;
                 when(reportRepository.findById(anyInt()))
                                 .thenReturn(Optional.empty());
 
                 NotFoundException e = assertThrows(NotFoundException.class,
-                                () -> reportService.findCommentsByReport(0, 0));
+                                () -> reportService.findCommentsByReport(reportId, 0));
 
-                assertEquals("Ocorrência não encontrada com id: 0", e.getMessage());
+                assertEquals(REPORT_NOT_FOUND.apply(reportId), e.getMessage());
         }
 }

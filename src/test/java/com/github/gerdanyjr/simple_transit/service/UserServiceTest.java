@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.LOGIN_ALREADY_REGISTERED;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,90 +31,93 @@ import com.github.gerdanyjr.simple_transit.service.impl.UserServiceImpl;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+        @Mock
+        private UserRepository userRepository;
 
-    @Mock
-    private BCryptPasswordEncoder encoder;
+        @Mock
+        private BCryptPasswordEncoder encoder;
 
-    @Mock
-    private Authentication authentication;
+        @Mock
+        private Authentication authentication;
 
-    @InjectMocks
-    private UserServiceImpl userService;
+        @InjectMocks
+        private UserServiceImpl userService;
 
-    private User user;
+        private User user;
 
-    private User updatedUser;
+        private User updatedUser;
 
-    private RegisterUserReq registerUserReq;
+        private RegisterUserReq registerUserReq;
 
-    private UpdateUserReq updateUserReq;
+        private UpdateUserReq updateUserReq;
 
-    @BeforeEach
-    void setup() {
-        user = new User(1,
-                "teste",
-                "teste",
-                "teste",
-                List.of());
+        @BeforeEach
+        void setup() {
+                user = new User(1,
+                                "teste",
+                                "teste",
+                                "teste",
+                                List.of());
 
-        updatedUser = new User(1,
-                "teste2",
-                "teste2",
-                "teste2",
-                List.of());
+                updatedUser = new User(1,
+                                "teste2",
+                                "teste2",
+                                "teste2",
+                                List.of());
 
-        registerUserReq = new RegisterUserReq("teste",
-                "teste",
-                "teste");
+                registerUserReq = new RegisterUserReq("teste",
+                                "teste",
+                                "teste");
 
-        updateUserReq = new UpdateUserReq(
-                "teste2",
-                "teste2");
-    }
+                updateUserReq = new UpdateUserReq(
+                                "teste2",
+                                "teste2");
+        }
 
-    @Test
-    @DisplayName("should return created user when a inexistent user is passed")
-    void givenInexistentUser_whenRegister_thenReturnCreatedUser() {
-        when(userRepository.save(any(User.class)))
-                .thenReturn(user);
+        @Test
+        @DisplayName("should return created user when a inexistent user is passed")
+        void givenInexistentUser_whenRegister_thenReturnCreatedUser() {
+                when(userRepository.save(any(User.class)))
+                                .thenReturn(user);
 
-        when(userRepository.findByLogin(anyString()))
-                .thenReturn(Optional.empty());
+                when(userRepository.findByLogin(anyString()))
+                                .thenReturn(Optional.empty());
 
-        User createdUser = userService.register(registerUserReq);
+                User createdUser = userService.register(registerUserReq);
 
-        assertNotNull(createdUser);
-        assertEquals(createdUser, user);
-    }
+                assertNotNull(createdUser);
+                assertEquals(createdUser, user);
+        }
 
-    @Test
-    @DisplayName("should throw exception when existent user is passed")
-    void givenExistingUser_whenRegister_thenThrowException() {
-        when(userRepository.findByLogin(anyString()))
-                .thenReturn(Optional.of(user));
+        @Test
+        @DisplayName("should throw exception when existent user is passed")
+        void givenExistingUser_whenRegister_thenThrowException() {
+                when(userRepository.findByLogin(anyString()))
+                                .thenReturn(Optional.of(user));
 
-        assertThrows(
-                ConflictException.class,
-                () -> userService.register(registerUserReq));
-    }
+                ConflictException e = assertThrows(
+                                ConflictException.class,
+                                () -> userService.register(registerUserReq));
 
-    @Test
-    @DisplayName("should return updated user when updateUser")
-    void whenUpdateUser_thenReturnUpdatedUser() {
-        when(authentication.getPrincipal())
-                .thenReturn(user);
+                assertEquals(LOGIN_ALREADY_REGISTERED.apply(user.getLogin()), e.getMessage());
 
-        when(encoder.encode(anyString()))
-                .thenReturn("hashedPassword");
+        }
 
-        when(userRepository.save(any(User.class)))
-                .thenReturn(updatedUser);
+        @Test
+        @DisplayName("should return updated user when updateUser")
+        void whenUpdateUser_thenReturnUpdatedUser() {
+                when(authentication.getPrincipal())
+                                .thenReturn(user);
 
-        User result = userService.updateUser(updateUserReq);
+                when(encoder.encode(anyString()))
+                                .thenReturn("hashedPassword");
 
-        assertEquals(updatedUser.getName(), result.getName());
-        assertEquals(updatedUser.getPassword(), result.getPassword());
-    }
+                when(userRepository.save(any(User.class)))
+                                .thenReturn(updatedUser);
+
+                User result = userService.updateUser(updateUserReq);
+
+                assertEquals(updatedUser.getName(), result.getName());
+                assertEquals(updatedUser.getPassword(), result.getPassword());
+        }
 }

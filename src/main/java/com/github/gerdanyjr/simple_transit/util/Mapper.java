@@ -14,6 +14,9 @@ import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class Mapper {
 
     public static User fromRegisterReqToUser(RegisterUserReq req, BCryptPasswordEncoder encoder) {
