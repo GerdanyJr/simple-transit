@@ -33,14 +33,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
+import com.github.gerdanyjr.simple_transit.model.entity.Comment;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
 import com.github.gerdanyjr.simple_transit.model.entity.ReportType;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.ArgumentNotValidException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.UnauthorizedException;
+import com.github.gerdanyjr.simple_transit.repository.CommentRepository;
 import com.github.gerdanyjr.simple_transit.repository.ReportRepository;
 import com.github.gerdanyjr.simple_transit.repository.ReportTypeRepository;
 import com.github.gerdanyjr.simple_transit.repository.UserRepository;
@@ -58,6 +61,9 @@ public class ReportServiceTest {
         @Mock
         private UserRepository userRepository;
 
+        @Mock
+        private CommentRepository commentRepository;
+
         @InjectMocks
         private ReportServiceImpl reportService;
 
@@ -65,13 +71,17 @@ public class ReportServiceTest {
 
         private ReportType mockReportType;
 
+        private Comment mockComment;
+
         private User mockUser;
 
         private CreateReportReq req;
 
         private Principal principal;
 
-        private Page<Report> mockedPage;
+        private Page<Report> mockReportsPage;
+
+        private Page<Comment> mockCommentsPage;
 
         @BeforeEach
         void setup() {
@@ -96,6 +106,12 @@ public class ReportServiceTest {
                                 mockUser,
                                 mockReportType);
 
+                mockComment = new Comment(null,
+                                "Comment",
+                                LocalDateTime.now(),
+                                mockUser,
+                                mockReport);
+
                 req = new CreateReportReq("Summary",
                                 "Description",
                                 LocalDateTime.now(),
@@ -104,8 +120,13 @@ public class ReportServiceTest {
                                 -15.9714,
                                 1);
 
-                mockedPage = new PageImpl<>(
+                mockReportsPage = new PageImpl<>(
                                 List.of(mockReport, mockReport),
+                                PageRequest.of(0, 10),
+                                2);
+
+                mockCommentsPage = new PageImpl<>(
+                                List.of(mockComment, mockComment),
                                 PageRequest.of(0, 10),
                                 2);
 
@@ -331,7 +352,7 @@ public class ReportServiceTest {
                 when(reportRepository.findAll(
                                 any(Specification.class),
                                 any(Pageable.class)))
-                                .thenReturn(mockedPage);
+                                .thenReturn(mockReportsPage);
 
                 PageRes<ReportRes> pageRes = reportService.findAll(null,
                                 null,
@@ -345,5 +366,35 @@ public class ReportServiceTest {
                 assertNotNull(pageRes);
                 assertEquals(pageRes.data().size(), 2);
                 assertTrue(pageRes.isLastPage());
+        }
+
+        @Test
+        @DisplayName("should return report comments when a valid reportId is passed")
+        void givenValidReportId_whenFindCommentsByReport_thenReturnCommentRes() {
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.of(mockReport));
+
+                when(commentRepository.findByReport(
+                                any(Report.class),
+                                any(Pageable.class)))
+                                .thenReturn(mockCommentsPage);
+
+                PageRes<CommentRes> commentRes = reportService.findCommentsByReport(0, 0);
+
+                assertNotNull(commentRes);
+                assertEquals(2, commentRes.data().size());
+                assertTrue(commentRes.isLastPage());
+        }
+
+        @Test
+        @DisplayName("should return report comments when a valid reportId is passed")
+        void givenInexistingReportId_whenFindCommentsByReport_thenThrowException() {
+                when(reportRepository.findById(anyInt()))
+                                .thenReturn(Optional.empty());
+
+                NotFoundException e = assertThrows(NotFoundException.class,
+                                () -> reportService.findCommentsByReport(0, 0));
+
+                assertEquals("Ocorrência não encontrada com id: 0", e.getMessage());
         }
 }
