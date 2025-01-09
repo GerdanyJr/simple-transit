@@ -32,7 +32,7 @@ public class ReportController {
         this.reportService = reportService;
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Report> create(
             @RequestBody @Valid CreateReportReq req,
             Principal principal) {

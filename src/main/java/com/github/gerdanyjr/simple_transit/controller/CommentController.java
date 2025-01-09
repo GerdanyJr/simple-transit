@@ -23,7 +23,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @PostMapping
+    @PostMapping("/")
     public ResponseEntity<Void> create(@RequestBody @Valid CreateCommentReq req, Principal principal) {
         return ResponseEntity
                 .created(commentService.create(req, principal))
