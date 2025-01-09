@@ -15,15 +15,15 @@ import com.github.gerdanyjr.simple_transit.util.Mapper;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final Authentication authentication;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final Authentication authentication;
 
-    public UserServiceImpl(Authentication authentication, UserRepository userRepository,
-            BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.authentication = authentication;
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+            Authentication authentication) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.authentication = authentication;
     }
 
     @Override
