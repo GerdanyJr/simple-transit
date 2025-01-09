@@ -46,7 +46,7 @@ public class Report {
 
     private Double longitude;
 
-    @OneToMany(mappedBy = "report")
+    @OneToMany(mappedBy = "report", cascade = CascadeType.REMOVE)
     private List<Comment> comments;
 
     @ManyToOne(cascade = CascadeType.ALL)
