@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.CommentRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.PageRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ReportRes;
 import com.github.gerdanyjr.simple_transit.model.entity.Report;
@@ -23,4 +24,6 @@ public interface ReportService {
             Integer page,
             String sortDirection,
             String sortBy);
+
+    PageRes<CommentRes> findCommentsByReport(Integer reportId, Integer page);
 }
