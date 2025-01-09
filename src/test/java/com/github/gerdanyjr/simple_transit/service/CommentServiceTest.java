@@ -11,11 +11,13 @@ import static org.mockito.Mockito.when;
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_NOT_FOUND;
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 
+import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateCommentReq;
 import com.github.gerdanyjr.simple_transit.model.entity.Comment;
@@ -60,6 +65,14 @@ public class CommentServiceTest {
 
         private Principal principal;
 
+        @BeforeAll
+        static void setupMockRequest() {
+                MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+                mockRequest.setRequestURI("/comentarios");
+                ServletRequestAttributes attributes = new ServletRequestAttributes(mockRequest);
+                RequestContextHolder.setRequestAttributes(attributes);
+        }
+
         @BeforeEach
         void setup() {
                 principal = mock(Principal.class);
@@ -93,7 +106,7 @@ public class CommentServiceTest {
         }
 
         @Test
-        @DisplayName("should return created comment when a valid comment is passed")
+        @DisplayName("should return created comment location when a valid comment is passed")
         void givenValidComment_whenCreate_thenReturnComment() {
                 when(reportRepository.findById(anyInt()))
                                 .thenReturn(Optional.of(mockReport));
@@ -107,9 +120,10 @@ public class CommentServiceTest {
                 when(commentRepository.save(any(Comment.class)))
                                 .thenReturn(mockComment);
 
-                Comment comment = commentService.create(createCommentReq, principal);
+                URI uri = commentService.create(createCommentReq, principal);
 
-                assertNotNull(comment);
+                assertNotNull(uri);
+                assertEquals("/comentarios/1", uri.getPath());
         }
 
         @Test

@@ -4,6 +4,7 @@ import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_NOT_FOUND;
 
+import java.net.URI;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
@@ -34,6 +35,7 @@ import com.github.gerdanyjr.simple_transit.service.ReportService;
 import com.github.gerdanyjr.simple_transit.specifications.ReportSpecifications;
 import com.github.gerdanyjr.simple_transit.util.Mapper;
 import com.github.gerdanyjr.simple_transit.util.TimeUtil;
+import com.github.gerdanyjr.simple_transit.util.UriUtil;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -52,7 +54,7 @@ public class ReportServiceImpl implements ReportService {
         }
 
         @Override
-        public Report create(CreateReportReq req, Principal principal) {
+        public URI create(CreateReportReq req, Principal principal) {
                 ReportType reportType = reportTypeRepository
                                 .findById(req.reportTypeId())
                                 .orElseThrow(() -> new NotFoundException(
@@ -70,9 +72,13 @@ public class ReportServiceImpl implements ReportService {
                         throw new ArgumentNotValidException(ErrorMessages.FUTURE_REPORT_DATE);
                 }
 
-                Report report = Mapper.fromCreateReportReqToReport(req, user, reportType);
+                Report createdReport = reportRepository.save(
+                                Mapper.fromCreateReportReqToReport(
+                                                req,
+                                                user,
+                                                reportType));
 
-                return reportRepository.save(report);
+                return UriUtil.createUri("/{id}", createdReport.getId().toString());
         }
 
         @Override

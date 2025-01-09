@@ -16,12 +16,14 @@ import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.REPORT_NOT_FOUND;
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 
+import java.net.URI;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.github.gerdanyjr.simple_transit.constants.ErrorMessages;
 import com.github.gerdanyjr.simple_transit.model.dto.req.CreateReportReq;
@@ -87,6 +92,14 @@ public class ReportServiceTest {
 
         private Page<Comment> mockCommentsPage;
 
+        @BeforeAll
+        static void setupMockRequest() {
+                MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+                mockRequest.setRequestURI("/ocorrencias");
+                ServletRequestAttributes attributes = new ServletRequestAttributes(mockRequest);
+                RequestContextHolder.setRequestAttributes(attributes);
+        }
+
         @BeforeEach
         void setup() {
                 principal = mock(Principal.class);
@@ -99,7 +112,7 @@ public class ReportServiceTest {
                                 "Password",
                                 List.of());
 
-                mockReport = new Report(null,
+                mockReport = new Report(1,
                                 "Summary",
                                 "Description",
                                 LocalDateTime.now(),
@@ -110,7 +123,7 @@ public class ReportServiceTest {
                                 mockUser,
                                 mockReportType);
 
-                mockComment = new Comment(null,
+                mockComment = new Comment(1,
                                 "Comment",
                                 LocalDateTime.now(),
                                 mockUser,
@@ -137,7 +150,7 @@ public class ReportServiceTest {
         }
 
         @Test
-        @DisplayName("should return created report when a valid report is passed")
+        @DisplayName("should return created report location when a valid report is passed")
         void givenValidReport_whenCreate_thenReturnCreatedReport() {
                 when(principal.getName())
                                 .thenReturn(mockUser.getLogin());
@@ -151,12 +164,12 @@ public class ReportServiceTest {
                 when(reportRepository.save(any(Report.class)))
                                 .thenReturn(mockReport);
 
-                Report result = reportService.create(req, principal);
+                URI uri = reportService.create(req, principal);
 
-                assertEquals(mockReport, result);
+                assertNotNull(uri);
+                assertEquals("/ocorrencias/1", uri.getPath());
                 verify(reportTypeRepository).findById(1);
                 verify(userRepository).findByLogin("Login");
-                verify(reportRepository).save(mockReport);
         }
 
         @Test
