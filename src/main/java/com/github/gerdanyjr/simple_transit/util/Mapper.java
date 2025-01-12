@@ -82,6 +82,7 @@ public class Mapper {
                 comment.getComment(),
                 comment.getDate(),
                 comment.getUser().getId(),
+                comment.getUser().getUsername(),
                 comment.getReport().getId());
     }
 

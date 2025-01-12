@@ -5,10 +5,11 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 public record CommentRes(
-                Integer id,
-                String comment,
-                @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime date,
-                Integer userId,
-                Integer reportId) {
+        Integer id,
+        String comment,
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime date,
+        Integer userId,
+        String username,
+        Integer reportId) {
 
 }
