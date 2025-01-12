@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
 import com.github.gerdanyjr.simple_transit.model.dto.req.RefreshTokenReq;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ErrorResponse;
+import com.github.gerdanyjr.simple_transit.model.dto.res.LoginRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.ValidationErrorResponse;
 import com.github.gerdanyjr.simple_transit.service.AuthService;
@@ -46,7 +47,7 @@ public class AuthController {
             })
     })
     @PostMapping("/login")
-    public ResponseEntity<TokenRes> login(@RequestBody @Valid LoginReq req) {
+    public ResponseEntity<LoginRes> login(@RequestBody @Valid LoginReq req) {
         return ResponseEntity.ok(authService.login(req));
     }
 

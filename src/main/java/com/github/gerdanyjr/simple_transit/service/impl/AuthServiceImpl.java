@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import static com.github.gerdanyjr.simple_transit.constants.ErrorMessages.USER_NOT_FOUND;
 import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.LoginRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
@@ -32,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenRes login(LoginReq req) {
+    public LoginRes login(LoginReq req) {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 req.login(),
                 req.password());
@@ -44,7 +45,11 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenService.generateAccessToken(user);
         String refreshToken = tokenService.generateRefreshToken(user);
 
-        return new TokenRes(accessToken, refreshToken);
+        return new LoginRes(
+                user.getId(),
+                user.getLogin(),
+                accessToken,
+                refreshToken);
     }
 
     @Override

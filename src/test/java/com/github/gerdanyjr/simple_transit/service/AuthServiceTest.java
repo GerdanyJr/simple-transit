@@ -25,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import com.github.gerdanyjr.simple_transit.model.dto.req.LoginReq;
+import com.github.gerdanyjr.simple_transit.model.dto.res.LoginRes;
 import com.github.gerdanyjr.simple_transit.model.dto.res.TokenRes;
 import com.github.gerdanyjr.simple_transit.model.entity.User;
 import com.github.gerdanyjr.simple_transit.model.exception.impl.NotFoundException;
@@ -83,11 +84,11 @@ public class AuthServiceTest {
                 when(tokenService.generateRefreshToken(any(User.class)))
                                 .thenReturn(refreshToken);
 
-                TokenRes tokenRes = authService.login(loginReq);
+                LoginRes loginRes = authService.login(loginReq);
 
-                assertNotNull(tokenRes);
-                assertEquals(accessToken, tokenRes.authToken());
-                assertEquals(refreshToken, tokenRes.refreshToken());
+                assertNotNull(loginRes);
+                assertEquals(accessToken, loginRes.authToken());
+                assertEquals(refreshToken, loginRes.refreshToken());
         }
 
         @Test
