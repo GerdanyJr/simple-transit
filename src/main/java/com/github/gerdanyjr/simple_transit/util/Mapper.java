@@ -63,13 +63,16 @@ public class Mapper {
                 report.getLatitude(),
                 report.getLongitude(),
                 report.getUser().getId(),
-                report.getReportType().getId());
+                report.getUser().getUsername(),
+                report.getReportType().getId(),
+                report.getReportType().getDescription());
     }
 
     public static <T> PageRes<T> fromPageToPageRes(Page<T> page) {
         return new PageRes<>(page.getContent(),
                 page.getNumber(),
                 page.getTotalPages(),
+                page.getTotalElements(),
                 page.getNumberOfElements(),
                 page.isLast());
     }
