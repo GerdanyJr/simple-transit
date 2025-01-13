@@ -6,8 +6,9 @@ spring:
     defer-datasource-initialization: false
 
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
 
   h2:
     console:
