@@ -98,3 +98,23 @@ docker run --name postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgre
 #### Uso
 
 Acesse a documentação da API em `http://localhost:8081/api/v1/swagger-ui.html` para ver os endpoints disponíveis.
+
+### Melhorias e Correções
+
+# Checklist de Tarefas
+
+1. [ ] **[BUG]** Ao salvar o comentário, o mesmo não aparece automaticamente nos comentários listados, necessitando sair e voltar na tela. [Front-end]
+2. [ ] **[Novo recurso]** Criar endpoint que traga a lista de ocorrências mais relevantes dentro de um período X de tempo, baseado na quantidade de comentários de cada ocorrência. [Back-end]
+3. [ ] **[BUG]** Não permitir que ocorrências possam ser feitas em datas futuras. [Back-end]
+4. [ ] **[Novo recurso]** Os dashboards atuais estão com dados fixos, colocar para que eles funcionem a partir de dados inseridos no sistema. [Front-end]
+5. [ ] **[Novo recurso]** Fazer com que a palavra chave consulte não somente o resumo e a descrição, mas também o relator, endereço e tipo de ocorrência. [Front-end]/[Back-end]
+6. [ ] **[Melhoria]** Substitua os testes do tipo “Mock” por testes utilizando “Repository Fake”. Faça em pelo menos 1 classe de teste. [Back-end]
+7. [ ] **[BUG]** Exceções não tratadas ou endpoints inexistentes estão sendo retornadas com 403, faça com que retorne com os códigos de status corretos. [Back-end]
+8. [ ] **[BUG]** Ao criar ocorrência: [Front-end]
+    - [ ] a. Retornar para o usuário um feedback visual quando algo dá errado (por exemplo, quando tenta-se criar uma ocorrência com mais de 2 dias).
+    - [ ] b. Limpar os campos após a criação da ocorrência com sucesso.
+9. [ ] **[Novo recurso]** Todos os eventos do tipo “Fiscalização de Trânsito” devem vir obrigatoriamente com a Latitude e Longitude, além do endereço. Para todos os outros tipos a Latitude e Longitude ficam opcionais e o endereço fica como obrigatório. [Back-end]
+10. [ ] **[Novo recurso]** Bloquear palavras ofensivas nos comentários e emitir alertas alertando os mesmos. Exemplo de palavra a ser bloqueada: “idiota” e “imbecil”. [Back-end]
+11. [ ] **[Melhoria]** Validar para que dois usuários não possuam o mesmo login. [Back-end]
+12. [ ] **[Novo recurso]** O sistema deve atualizar uma ocorrência feita. [Front-end]/[Back-end]
+13. [ ] **[Novo recurso]** Criar o campo “Situação” (“Resolvida”/“Não resolvida”) para as ocorrências. De forma que ao fazer um novo comentário, o usuário precisa dizer a situação da ocorrência. Quando houver três comentários em que a situação foi “Resolvida”, na ocorrência deve aparecer como “Resolvida”. [Back-end]
